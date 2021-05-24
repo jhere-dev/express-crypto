@@ -2,13 +2,17 @@ const {
   insertUser,
   findUserWithPasswordByEmail,
   findAllUserWithPagination,
+  deleteUserById,
 } = require("../repositories/userRepository");
 const ERRORS = require("../utils/errorMessages");
 const encryptPassword = require("../utils/encryptPassword");
+const HttpError = require("../utils/httpError");
 
 const createUser = async (user) => {
   const { email, password, name } = user;
-  if (!email || !password) throw new Error(ERROR.NO_USER_DATA_PROVIDED);
+  if (!email || !password) {
+    throw new HttpError(400, ERRORS.NO_USER_DATA_PROVIDED);
+  }
 
   const encryptedPassword = await encryptPassword(password);
 
@@ -18,16 +22,16 @@ const createUser = async (user) => {
 const loginUser = async (loginData) => {
   const { email, password } = loginData;
 
-  if (!email || !password) throw new Error(ERRORS.INVALID_DATA);
+  if (!email || !password) new HttpError(401, ERRORS.INVALID_DATA);
 
   const user = await findUserWithPasswordByEmail(email);
 
-  if (!user) throw new Error(ERROR.INVALID_USER);
+  if (!user) throw new HttpError(401, ERRORS.INVALID_USER);
 
   const encryptedPassword = await encryptPassword(password);
 
   if (user.password !== encryptedPassword) {
-    throw new Error(ERROR.INVALID_PASSWORD);
+    throw new HttpError(401, ERRORS.INVALID_PASSWORD);
   }
 
   return user.toJSON();
@@ -38,4 +42,10 @@ const getAllUsers = async (pagination) => {
   return await findAllUserWithPagination(+limit, +offset);
 };
 
-module.exports = { createUser, loginUser, getAllUsers };
+const removeUser = async (id) => {
+  if (!id) throw new HttpError(400, ERRORS.INVALID_ID);
+
+  await deleteUserById(id);
+};
+
+module.exports = { createUser, loginUser, getAllUsers, removeUser };

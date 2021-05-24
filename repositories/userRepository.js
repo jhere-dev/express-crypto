@@ -15,3 +15,7 @@ exports.findUserWithPasswordByEmail = async (email) => {
 exports.insertUser = async (user) => {
   await User.create(user);
 };
+
+exports.deleteUserById = async (id) => {
+  return await User.destroy({ where: { id } });
+};

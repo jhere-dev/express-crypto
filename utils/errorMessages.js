@@ -6,3 +6,5 @@ exports.INVALID_DATA = "Data provided is invalid";
 exports.INVALID_USER = "User must be exist in db";
 
 exports.INVALID_PASSWORD = "Your password is incorrect";
+
+exports.INVALID_ID = "Invalid Id";
